@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "884277605531",
+    "project_id": "don-de-sang-d72fb",
+    "storage_bucket": "don-de-sang-d72fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:884277605531:android:6550b4db9804559cd3c23e",
+        "android_client_info": {
+          "package_name": "com.example.app_don_0"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "884277605531-v024oa2umdvbdt0p2idv29s67bof4rof.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAi5YdgOFbQ5MNLQy1_nRavZQGFAs6WuIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "884277605531-v024oa2umdvbdt0p2idv29s67bof4rof.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "884277605531-ej4vs3nua16lalr4tab9a0j56rdgfgl2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appDon0"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
