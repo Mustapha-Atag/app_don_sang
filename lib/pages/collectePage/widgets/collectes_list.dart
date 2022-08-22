@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -11,12 +12,18 @@ import '../providers.dart';
 import 'others_widget.dart';
 
 class CollectesListHeader extends StatelessWidget {
-  const CollectesListHeader({Key? key, required this.panelController})
+  const CollectesListHeader(
+      {Key? key, required this.panelController, required this.snapshot})
       : super(key: key);
   final PanelController panelController;
+  final AsyncSnapshot<QuerySnapshot> snapshot;
 
   @override
   Widget build(BuildContext context) {
+    final collectesCount = (snapshot.hasError || !snapshot.hasData)
+        ? 0
+        : snapshot.data!.docs.length;
+
     return GestureDetector(
       onTap: (() {
         final panelControll =
@@ -30,16 +37,16 @@ class CollectesListHeader extends StatelessWidget {
         }
       }),
       child: Column(
-        children: const [
-          SnapBar(),
+        children: [
+          const SnapBar(),
           ListTile(
-            title: Text(
+            title: const Text(
               "les lieux de collectes disponibles",
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            subtitle: Text("4 centres"),
+            subtitle: Text("$collectesCount centres"),
           ),
-          Divider(
+          const Divider(
             thickness: 2,
             height: 2,
           )
@@ -54,19 +61,37 @@ class CollectesListItems extends StatelessWidget {
       {Key? key,
       required this.scrollController,
       required this.mapController,
-      required this.panelController})
+      required this.panelController,
+      required this.snapshot})
       : super(key: key);
 
   final ScrollController scrollController;
   final Completer<GoogleMapController> mapController;
   final PanelController panelController;
+  final AsyncSnapshot<QuerySnapshot> snapshot;
 
   @override
   Widget build(BuildContext context) {
+    if (snapshot.hasError) {
+      return const Center(child: Text("something goes wrong"));
+    }
+
+    if (snapshot.connectionState == ConnectionState.waiting ||
+        !snapshot.hasData) {
+      return const Center(child: Text("loading data ..."));
+    }
+
+    final documents = snapshot.data!.docs;
+
     return ListView.builder(
       controller: scrollController,
+      itemCount: documents.length,
       itemBuilder: (context, index) {
-        final Centre centre = centres[index];
+        final document = documents[index];
+        final Map<String, dynamic> collecteData =
+            document.data()! as Map<String, dynamic>;
+        print(collecteData);
+
         return GestureDetector(
           onTap: () async {
             final panelProvider =
@@ -76,27 +101,34 @@ class CollectesListItems extends StatelessWidget {
             await panelController.animatePanelToPosition(0.35,
                 duration: const Duration(milliseconds: 300));
 
-            panelProvider.selectdCenter = centre;
+            panelProvider.selectedCollecte = collecteData;
             panelProvider.panelContent =
                 panelProvider.panelContent == 0 ? 1 : 0;
 
+            final GeoPoint coordonnees = collecteData["coordonnées"];
             controller.animateCamera(CameraUpdate.newCameraPosition(
                 CameraPosition(
-                    zoom: 14, target: LatLng(centre.lat, centre.lng))));
+                    zoom: 14,
+                    target:
+                        LatLng(coordonnees.latitude, coordonnees.longitude))));
           },
-          child: CollectesListItem(centre: centre),
+          child: CollectesListItem(
+            collecteData: collecteData,
+          ),
         );
       },
-      itemCount: centres.length,
+
       //controller: widget.scrollController,
     );
   }
 }
 
 class CollectesListItem extends StatelessWidget {
-  const CollectesListItem({Key? key, required this.centre}) : super(key: key);
+  const CollectesListItem(
+      {Key? key, /*required this.collecteData,*/ required this.collecteData})
+      : super(key: key);
 
-  final Centre centre;
+  final Map<String, dynamic> collecteData;
 
   static TextStyle titleStyle =
       const TextStyle(fontWeight: FontWeight.w600, fontSize: 16);
@@ -120,16 +152,16 @@ class CollectesListItem extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(centre.centreName, style: titleStyle),
+                        Text(collecteData["nom"], style: titleStyle),
                         Text(
-                          centre.ville,
+                          collecteData["ville"],
                           style: subTitleStyle,
                         ),
                         const SizedBox(
                           height: 10,
                         ),
                         DonOptionsRow(
-                          centre: centre,
+                          options: collecteData["donOptions"],
                         )
                       ],
                     ),

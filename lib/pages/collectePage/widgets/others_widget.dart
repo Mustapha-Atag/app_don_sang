@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../models/collecte_model.dart';
 
 class DonOptionsRow extends StatelessWidget {
-  const DonOptionsRow({Key? key, required this.centre}) : super(key: key);
+  const DonOptionsRow({Key? key, required this.options}) : super(key: key);
 
-  final Centre centre;
+  final List options;
 
   static Map<String, MaterialColor> dropColors = {
     "sang": Colors.red,
@@ -16,7 +16,7 @@ class DonOptionsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: centre.donOptions
+      children: options
           .map((option) => Row(
                 children: [
                   Icon(

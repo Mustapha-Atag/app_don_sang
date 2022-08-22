@@ -28,10 +28,10 @@ class CollecteDetailHeader extends StatelessWidget {
           const SnapBar(),
           ListTile(
             title: Text(
-              panelProvider.selectdCenter.centreName,
+              panelProvider.selectedCollecte["nom"],
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            subtitle: Text(panelProvider.selectdCenter.ville),
+            subtitle: Text(panelProvider.selectedCollecte["ville"]),
             trailing: IconButton(
               onPressed: () async {
                 final panelProvider =
@@ -121,11 +121,7 @@ class CollecteDetail extends StatelessWidget {
                               .map((day) => DayHour(
                                   day: day,
                                   hour: panelProvider
-                                              .selectdCenter.horaire[day] !=
-                                          null
-                                      ? panelProvider.selectdCenter.horaire[day]
-                                          .toString()
-                                      : "Fermé"))
+                                      .selectedCollecte["horaire"][day]))
                               .toList(),
                         );
                       } else if (infosKeywords[index] == "type de don") {
@@ -133,19 +129,19 @@ class CollecteDetail extends StatelessWidget {
                         return ExpansionTile(
                           title: const Text("Type de don"),
                           leading: infoIcons[keyword],
-                          children: panelProvider.selectdCenter.donOptions
-                              .map((option) => Padding(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 10, left: 70),
-                                    child: OptionRow(option: option),
-                                  ))
-                              .toList(),
+                          children: panelProvider.selectedCollecte["donOptions"]
+                              .map<Widget>((option) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.only(bottom: 10, left: 70),
+                              child: OptionRow(option: option),
+                            );
+                          }).toList(),
                         );
                       } else {
                         String keyword = infosKeywords[index];
                         return ListTile(
-                          title:
-                              Text(panelProvider.selectdCenter.infos[keyword]),
+                          title: Text(panelProvider.selectedCollecte[keyword]),
                           leading: infoIcons[keyword],
                         );
                       }
@@ -164,7 +160,7 @@ class CollecteDetail extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, "/prendre_rendez-vous",
-                          arguments: panelProvider.selectdCenter);
+                          arguments: panelProvider.selectedCollecte);
                     },
                     child: const Text("Prendre un rendez-vous"),
                   ),
@@ -181,7 +177,7 @@ class DayHour extends StatelessWidget {
       : super(key: key);
 
   final String day;
-  final String hour;
+  final Map<String, dynamic>? hour;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -195,7 +191,9 @@ class DayHour extends StatelessWidget {
           ),
           Container(
             width: 100,
-            child: Text(hour.toString()),
+            child: hour != null
+                ? Text("${hour?['debut']} - ${hour?['fin']}")
+                : const Text("Fermé"),
           )
         ],
       ),

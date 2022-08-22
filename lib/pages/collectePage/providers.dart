@@ -5,12 +5,12 @@ import '../../models/collecte_model.dart';
 class PanelProvider with ChangeNotifier {
   int _panelContent = 0;
   bool _isPanelOpen = false;
-  Centre _selectdCenter = centres[0];
+  Map<String, dynamic> _selectedCollecte = {};
 
-  Centre get selectdCenter => _selectdCenter;
+  Map<String, dynamic> get selectedCollecte => _selectedCollecte;
 
-  set selectdCenter(Centre selectdCenter) {
-    _selectdCenter = selectdCenter;
+  set selectedCollecte(Map<String, dynamic> selectedCollecte) {
+    _selectedCollecte = selectedCollecte;
     notifyListeners();
   }
 
