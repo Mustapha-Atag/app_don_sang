@@ -90,6 +90,7 @@ class CollectesListItems extends StatelessWidget {
         final document = documents[index];
         final Map<String, dynamic> collecteData =
             document.data()! as Map<String, dynamic>;
+        collecteData['collecteId'] = document.id; // adding the document Id
         print(collecteData);
 
         return GestureDetector(

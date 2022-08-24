@@ -4,7 +4,7 @@ import './donneur_model.dart';
 
 class Rdv {
   Rdv({
-    required this.centreId,
+    required this.collecteId,
     required this.centreName,
     required this.centreAddr,
     required this.donneur,
@@ -13,10 +13,10 @@ class Rdv {
     required this.typeDon,
   });
 
-  final Donneur donneur;
-  final int centreId;
+  final int collecteId;
   final String centreName;
   final String centreAddr;
+  final Donneur donneur;
   final DateTime dateDon;
   final TimeOfDay heure;
   final String typeDon;

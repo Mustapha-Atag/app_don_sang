@@ -4,10 +4,12 @@ import 'package:flutter/src/widgets/framework.dart';
 import '../models/collecte_model.dart';
 
 class PrendreRDVPage extends StatefulWidget {
-  const PrendreRDVPage({Key? key, required this.centre}) : super(key: key);
+  const PrendreRDVPage({Key? key, required this.collecteData})
+      : super(key: key);
 
   static const String routeName = "/prendre_rendez-vous";
-  final Centre centre;
+  //final Centre centre;
+  final Map<String, dynamic> collecteData;
 
   @override
   State<PrendreRDVPage> createState() => _PrendreRDVPageState();
@@ -25,7 +27,7 @@ class _PrendreRDVPageState extends State<PrendreRDVPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _selectedOption = widget.centre.donOptions[0];
+    _selectedOption = widget.collecteData["donOptions"][0];
   }
 
   void _selectDonOption(String? newValue) {
@@ -66,17 +68,28 @@ class _PrendreRDVPageState extends State<PrendreRDVPage> {
 
   @override
   Widget build(BuildContext context) {
+    Duration? debut;
+    Duration? fin;
+
     int weekDay = _selectedDate.weekday;
     String dayName = days[weekDay - 1];
-    OpeningTime? openingTime = widget.centre.horaire[dayName];
-    late Duration start;
-    late Duration end;
-    if (openingTime != null) {
-      start = Duration(
-          hours: openingTime.start.hour, minutes: openingTime.start.minute);
-      end = Duration(
-          hours: openingTime.end.hour, minutes: openingTime.end.minute);
-      _numberOfHours = (end - start).inHours * 2;
+
+    final Map<String, dynamic>? openingTime1 = widget.collecteData["horaire"]
+        [dayName]; // ex : {"debut" : "09:00", "fin" : "16:00"} or null
+
+    if (openingTime1 != null) {
+      String debutStringFormat = openingTime1["debut"]; // ex : "09:00"
+      String finStringFormat = openingTime1["fin"]; // ex : "16:00"
+
+      List<String> debutArray =
+          debutStringFormat.split(":"); // ex : ["09", "00"]
+      List<String> finArray = finStringFormat.split(":"); // ex : ["16", "00"]
+
+      debut = Duration(
+          hours: int.parse(debutArray[0]), minutes: int.parse(debutArray[1]));
+      fin = Duration(
+          hours: int.parse(finArray[0]), minutes: int.parse(finArray[1]));
+      _numberOfHours = (fin - debut).inHours * 2;
     }
 
     return Scaffold(
@@ -103,9 +116,10 @@ class _PrendreRDVPageState extends State<PrendreRDVPage> {
                     isExpanded: true,
                     underline: const SizedBox(),
                     style: const TextStyle(fontSize: 16, color: Colors.black),
-                    items: widget.centre.donOptions
-                        .map((option) => DropdownMenuItem<String>(
-                            value: option, child: Text(option)))
+                    items: widget.collecteData["donOptions"]
+                        .map<DropdownMenuItem<String>>((option) =>
+                            DropdownMenuItem<String>(
+                                value: option, child: Text(option)))
                         .toList(),
                     onChanged: _selectDonOption),
               ),
@@ -130,7 +144,7 @@ class _PrendreRDVPageState extends State<PrendreRDVPage> {
                       int weekDay = date.weekday; // Monday has weekday of one
                       String dayName = days[weekDay - 1];
 
-                      return (widget.centre.horaire[dayName] != null);
+                      return (widget.collecteData["horaire"][dayName] != null);
                     },
                     onDateChanged: _onDateChange),
               ),
@@ -151,20 +165,9 @@ class _PrendreRDVPageState extends State<PrendreRDVPage> {
                   scrollDirection: Axis.horizontal,
                   itemCount: _numberOfHours,
                   itemBuilder: (BuildContext context, int index) {
-                    int weekDay = _selectedDate.weekday;
-                    String dayName = days[weekDay - 1];
-                    OpeningTime openingTime = widget.centre.horaire[dayName]!;
-                    // I use Duration class for time comparaison
-                    Duration startTime = Duration(
-                        hours: openingTime.start.hour,
-                        minutes: openingTime.start.minute);
-                    Duration endTime = Duration(
-                        hours: openingTime.end.hour,
-                        minutes: openingTime.end.minute);
-
-                    if (startTime + Duration(minutes: (index * 30)) < endTime) {
-                      Duration temp =
-                          startTime + Duration(minutes: (index * 30));
+                    // I use Duration class for time comparaison and arithmetic operations
+                    if (debut! + Duration(minutes: (index * 30)) < fin!) {
+                      Duration temp = debut + Duration(minutes: (index * 30));
                       TimeOfDay hour = TimeOfDay(
                           hour: temp.inHours,
                           minute: (temp.inMinutes - temp.inHours * 60));
@@ -197,7 +200,9 @@ class _PrendreRDVPageState extends State<PrendreRDVPage> {
                                 "donOption": _selectedOption,
                                 "date": _selectedDate,
                                 "heure": _selectedHour,
-                                "centre": widget.centre
+                                "collecteId": widget.collecteData["collecteId"],
+                                "collecteName": widget.collecteData["nom"],
+                                "collecteAddr": widget.collecteData["adresse"]
                               };
 
                               Navigator.of(context).pushNamed(

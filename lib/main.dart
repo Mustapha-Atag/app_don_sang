@@ -42,11 +42,11 @@ class MyApp extends StatelessWidget {
         },
         onGenerateRoute: (settings) {
           if (settings.name == PrendreRDVPage.routeName) {
-            final args = settings.arguments as Centre;
+            final args = settings.arguments as Map<String, dynamic>;
 
             return MaterialPageRoute(builder: (context) {
               return PrendreRDVPage(
-                centre: args,
+                collecteData: args,
               );
             });
           } else if (settings.name == RemplirInfosPersonelPage.routeName) {

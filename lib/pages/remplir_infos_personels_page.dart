@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
@@ -29,6 +30,11 @@ class _RemplirInfosPersonelPageState extends State<RemplirInfosPersonelPage> {
   final _formKey = GlobalKey<FormState>();
   late String _nom, _prenom, _numero, _email;
 
+  final CollectionReference RdvCollection =
+      FirebaseFirestore.instance.collection("Rdvs");
+  final CollectionReference collectesCollection =
+      FirebaseFirestore.instance.collection("collectes");
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +47,7 @@ class _RemplirInfosPersonelPageState extends State<RemplirInfosPersonelPage> {
                   child: ListView(
                       //crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        /* nom */
                         TextFormField(
                           decoration: const InputDecoration(labelText: "Nom*"),
                           keyboardType: TextInputType.name,
@@ -59,6 +66,7 @@ class _RemplirInfosPersonelPageState extends State<RemplirInfosPersonelPage> {
                           },
                         ),
                         const WhiteSpace(),
+                        /* prenom */
                         TextFormField(
                             decoration:
                                 const InputDecoration(labelText: "Prenom*"),
@@ -77,6 +85,7 @@ class _RemplirInfosPersonelPageState extends State<RemplirInfosPersonelPage> {
                               return null;
                             }),
                         const WhiteSpace(),
+                        /* phone input */
                         TextFormField(
                             decoration: const InputDecoration(
                                 labelText: "Numero mobile*"),
@@ -95,6 +104,7 @@ class _RemplirInfosPersonelPageState extends State<RemplirInfosPersonelPage> {
                               }
                             }),
                         const WhiteSpace(),
+                        /* email input */
                         TextFormField(
                             decoration:
                                 const InputDecoration(labelText: "Email*"),
@@ -119,34 +129,55 @@ class _RemplirInfosPersonelPageState extends State<RemplirInfosPersonelPage> {
                               final form = _formKey.currentState;
                               if (form != null && form.validate()) {
                                 form.save();
-                                int centreId =
-                                    (widget.params["centre"] as Centre)
-                                        .centreId;
-                                String centreName =
-                                    (widget.params["centre"] as Centre)
-                                        .centreName;
-                                String centreAddr =
-                                    (widget.params["centre"] as Centre).adresse;
-                                Donneur donneur = Donneur(
-                                    nom: _nom,
-                                    prenom: _prenom,
-                                    email: _email,
-                                    phone: _numero);
+                                // donneur infos
+                                final Map<String, String> donneurInfo = {
+                                  "nom": _nom,
+                                  "prenom": _prenom,
+                                  "email": _email,
+                                  "phone": _numero
+                                };
+                                // get the data from previous page
+                                String collecteId = widget.params["collecteId"];
+                                String collecteName =
+                                    widget.params["collecteName"];
+                                String collecteAddr =
+                                    widget.params["collecteAddr"];
                                 DateTime dateDon = widget.params["date"];
                                 TimeOfDay heure = widget.params["heure"];
                                 String typeDon = widget.params["donOption"];
-                                Rdv newRdv = Rdv(
-                                    centreId: centreId,
-                                    centreName: centreName,
-                                    centreAddr: centreAddr,
-                                    donneur: donneur,
-                                    dateDon: dateDon,
-                                    heure: heure,
-                                    typeDon: typeDon);
+                                // rendez_vous infos
+                                final rdvInfos = {
+                                  "collecteId": collecteId,
+                                  "collecteNom": collecteName,
+                                  "collecteAdresse": collecteAddr,
+                                  "donneur": donneurInfo,
+                                  "dateDon": Timestamp.fromDate(dateDon),
+                                  "heure": "${heure.hour}:${heure.minute}",
+                                  "typeDon": typeDon
+                                };
+
                                 final appProvider = Provider.of<AppProvider>(
                                     context,
                                     listen: false);
-                                appProvider.add(newRdv);
+
+                                RdvCollection.add(rdvInfos).then((doc) {
+                                  print("rdv was added");
+                                  // adding the id of this RDV to the appProvider
+                                  appProvider.addRdv(doc.id);
+                                  // adding the id of this RDV to the collecte selected
+                                  collectesCollection
+                                      .doc(collecteId)
+                                      .update({
+                                        "reservations":
+                                            FieldValue.arrayUnion([doc.id])
+                                      })
+                                      .then((value) => print(
+                                          "collecte reservations was updated."))
+                                      .catchError((error) => print(
+                                          "failed to updated collecte reservations : $error"));
+                                }).catchError((error) =>
+                                    print("failed to add rdv : $error"));
+
                                 Fluttertoast.showToast(
                                     msg: "form is validated");
                                 Navigator.of(context).pushNamedAndRemoveUntil(
