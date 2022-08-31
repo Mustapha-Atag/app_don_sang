@@ -4,9 +4,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:email_validator/email_validator.dart';
 
-import 'widgets/login_screen.dart';
-import 'widgets/SingUp.dart';
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -79,76 +76,6 @@ class LoginWidget extends StatefulWidget {
 }
 
 class _LoginWidgetState extends State<LoginWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text(
-            "Vous étes pas identifiés.",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          // const SizedBox(
-          //   height: 5,
-          // ),
-          const Text(
-            "Si Vous avez une compte tu peut s'identifier,",
-            style:
-                TextStyle(fontSize: 14, color: Color.fromARGB(255, 83, 83, 83)),
-          ),
-          const Text(
-            "Si non tu peut s'inscrire.",
-            style:
-                TextStyle(fontSize: 14, color: Color.fromARGB(255, 83, 83, 83)),
-          ),
-          const SizedBox(
-            height: 30,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Sign in Button
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const LoginScreen()));
-                  },
-                  child: const Text(
-                    "S'identifier",
-                    style: TextStyle(fontSize: 16),
-                  )),
-              // Sign Up Button
-              OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const SignUp()));
-                  },
-                  child: const Text(
-                    "S'inscrire",
-                    style: TextStyle(fontSize: 16),
-                  ))
-            ],
-          )
-        ],
-      ),
-    );
-  }
-}
-
-// ##########################################################################
-
-class LoginWidget1 extends StatefulWidget {
-  const LoginWidget1({Key? key}) : super(key: key);
-
-  @override
-  State<LoginWidget1> createState() => _LoginWidget1State();
-}
-
-class _LoginWidget1State extends State<LoginWidget1> {
   final _formKey = GlobalKey<FormState>();
   String _email = "";
   String _password = "";

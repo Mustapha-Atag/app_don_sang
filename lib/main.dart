@@ -22,6 +22,8 @@ void main() async {
   runApp(const MyApp());
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -31,6 +33,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (context) => AppProvider())],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'Don de sang',
         theme: ThemeData(
           primarySwatch: Colors.red,
