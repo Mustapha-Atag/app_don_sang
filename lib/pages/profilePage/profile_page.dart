@@ -1,4 +1,5 @@
 import 'package:app_don_0/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -44,29 +45,51 @@ class UserProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text("signed in as :"),
-          Text(
-            user!.email ?? "email not found",
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Fluttertoast.showToast(msg: "you signed out");
-              },
-              child: const Text("Sign out"))
-        ],
-      ),
+    final usersCollection = FirebaseFirestore.instance.collection("users");
+
+    return FutureBuilder<DocumentSnapshot>(
+      future: usersCollection.doc(user!.uid).get(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError || (snapshot.hasData && !snapshot.data!.exists)) {
+          return const Center(child: Text("Something went wrong"));
+        }
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          Map<String, dynamic> userData =
+              snapshot.data!.data() as Map<String, dynamic>;
+
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text("signed in as :"),
+                Text(
+                  "${userData["nom"]} ${userData["prenom"]}, ${userData["age"]} years old",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "email : ${userData["email"]}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ElevatedButton(
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                      Fluttertoast.showToast(msg: "you signed out");
+                    },
+                    child: const Text("Sign out"))
+              ],
+            ),
+          );
+        }
+
+        return const Center(child: Text("loading"));
+      },
     );
   }
 }

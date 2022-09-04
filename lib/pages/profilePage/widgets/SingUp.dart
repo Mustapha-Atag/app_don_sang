@@ -1,4 +1,7 @@
+import 'package:app_don_0/main.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import './PersonnalInformation.dart';
 
 class SignUp extends StatefulWidget {
@@ -9,7 +12,12 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  bool _obscuretext = false;
+  final _emailController = TextEditingController();
+  final _passWordController01 = TextEditingController();
+  final _passWordController02 = TextEditingController();
+
+  bool _obscuretext1 = true;
+  bool _obscuretext2 = true;
 
   @override
   Widget build(BuildContext context) {
@@ -52,18 +60,18 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    buildEmail(),
+                    buildEmail(_emailController),
                     const SizedBox(height: 20),
-                    buildPassword(),
+                    buildPassword(_passWordController01),
                     const SizedBox(height: 20),
-                    buildPassword1(),
+                    buildPassword1(_passWordController02),
                     const SizedBox(height: 20),
                     buildSignupBtn(),
                   ],
                 ))));
   }
 
-  Widget buildEmail() {
+  Widget buildEmail(TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -88,12 +96,13 @@ class _SignUpState extends State<SignUp> {
                     offset: Offset(0, 2)),
               ]),
           height: 60,
-          child: const TextField(
+          child: TextField(
+            controller: controller,
             keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
+            style: const TextStyle(
               color: Color.fromARGB(255, 12, 12, 12),
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(top: 14),
                 prefixIcon: Icon(
@@ -110,7 +119,7 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  Widget buildPassword() {
+  Widget buildPassword(TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -136,7 +145,8 @@ class _SignUpState extends State<SignUp> {
               ]),
           height: 60,
           child: TextField(
-            obscureText: _obscuretext,
+            controller: controller,
+            obscureText: _obscuretext1,
             style: const TextStyle(
               color: Color.fromARGB(248, 0, 0, 0),
             ),
@@ -150,15 +160,15 @@ class _SignUpState extends State<SignUp> {
                 suffix: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _obscuretext = !_obscuretext;
+                        _obscuretext1 = !_obscuretext1;
                       });
                     },
                     child: Icon(
                         size: 20,
                         color: const Color(0xffff0000),
-                        (_obscuretext
-                            ? Icons.visibility_off
-                            : Icons.visibility))),
+                        (_obscuretext1
+                            ? Icons.visibility
+                            : Icons.visibility_off))),
                 hintText: 'Password',
                 hintStyle: const TextStyle(
                   color: Color(0xffff0000),
@@ -169,7 +179,7 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  Widget buildPassword1() {
+  Widget buildPassword1(TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -195,7 +205,8 @@ class _SignUpState extends State<SignUp> {
               ]),
           height: 60,
           child: TextField(
-            obscureText: _obscuretext,
+            controller: controller,
+            obscureText: _obscuretext2,
             style: const TextStyle(
               color: Color.fromARGB(248, 0, 0, 0),
             ),
@@ -209,15 +220,15 @@ class _SignUpState extends State<SignUp> {
                 suffix: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _obscuretext = !_obscuretext;
+                        _obscuretext2 = !_obscuretext2;
                       });
                     },
                     child: Icon(
                         size: 20,
                         color: const Color(0xffff0000),
-                        (_obscuretext
-                            ? Icons.visibility_off
-                            : Icons.visibility))),
+                        (_obscuretext2
+                            ? Icons.visibility
+                            : Icons.visibility_off))),
                 hintText: 'Password',
                 hintStyle: const TextStyle(
                   color: Color(0xffff0000),
@@ -233,10 +244,48 @@ class _SignUpState extends State<SignUp> {
         alignment: Alignment.center,
         child: TextButton(
           onPressed: () {
+            // validate email
+            if (_emailController.text.trim() == "") {
+              Fluttertoast.showToast(msg: "Entrer votre addresse email");
+              return;
+            }
+            if (!EmailValidator.validate(_emailController.text)) {
+              Fluttertoast.showToast(msg: "Entrer un email valide");
+              return;
+            }
+
+            // validate Password
+            if (_passWordController01.text.isEmpty) {
+              Fluttertoast.showToast(msg: "Entrer un mot de pass");
+              return;
+            }
+            if (_passWordController01.text.length < 8) {
+              Fluttertoast.showToast(
+                  msg: "Entrer un mot de pass avec minimum 8 charactères");
+              return;
+            }
+
+            // validate that the two passwords are the same
+            if (_passWordController01.text
+                    .compareTo(_passWordController02.text) !=
+                0) {
+              Fluttertoast.showToast(
+                  msg: "Les deux mots de pass ne sont pas les mémes");
+              return;
+            }
+
+            final Map<String, String> arguments = {
+              "email": _emailController.text,
+              "password": _passWordController01.text
+            };
+
+            // Go to another page to complete personnale infos
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) {
-                  return const PersonnlInformation();
+                  return PersonnlInformation(
+                    args: arguments,
+                  );
                 },
               ),
             );

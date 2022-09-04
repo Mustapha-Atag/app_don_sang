@@ -19,7 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passWordController = TextEditingController();
 
   bool isRememberMe = false;
-  bool _obscuretext = false;
+  bool _obscuretext = true;
 
   @override
   Widget build(BuildContext context) {
@@ -185,8 +185,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         size: 20,
                         color: const Color(0xffff0000),
                         (_obscuretext
-                            ? Icons.visibility_off
-                            : Icons.visibility))),
+                            ? Icons.visibility
+                            : Icons.visibility_off))),
                 hintText: 'Password',
                 hintStyle: const TextStyle(
                   color: Color(0xffff0000),
@@ -303,7 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.of(context).pop(); // remove CircularProgressIndicator
         },
         child: const Text(
-          'Login',
+          'Connecter',
           style: TextStyle(
             color: Color.fromARGB(246, 197, 31, 31),
             fontSize: 18,
@@ -328,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           },
           child: const Text(
-            'Don\'t have an Account? Sing Up',
+            "Don't have an Account? Sing Up",
             style: TextStyle(
               color: Color(0xffffffff),
               fontWeight: FontWeight.bold,
