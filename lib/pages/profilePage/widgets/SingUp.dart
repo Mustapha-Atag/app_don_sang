@@ -52,7 +52,7 @@ class _SignUpState extends State<SignUp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     const Text(
-                      'Sing Up',
+                      "S'inscrire",
                       style: TextStyle(
                         color: Color(0xffFFFFFF),
                         fontSize: 30,
@@ -124,7 +124,7 @@ class _SignUpState extends State<SignUp> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Text(
-          'Password',
+          'Mot de passe',
           style: TextStyle(
             color: Color(0xffffffff),
             fontSize: 15,
@@ -169,7 +169,7 @@ class _SignUpState extends State<SignUp> {
                         (_obscuretext1
                             ? Icons.visibility
                             : Icons.visibility_off))),
-                hintText: 'Password',
+                hintText: 'Mot de passe',
                 hintStyle: const TextStyle(
                   color: Color(0xffff0000),
                 )),
@@ -184,7 +184,7 @@ class _SignUpState extends State<SignUp> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Text(
-          'confirm Password',
+          'confirmez votre mot de passe',
           style: TextStyle(
             color: Color(0xffffffff),
             fontSize: 15,
@@ -229,7 +229,7 @@ class _SignUpState extends State<SignUp> {
                         (_obscuretext2
                             ? Icons.visibility
                             : Icons.visibility_off))),
-                hintText: 'Password',
+                hintText: 'Mot de passe',
                 hintStyle: const TextStyle(
                   color: Color(0xffff0000),
                 )),
@@ -291,7 +291,7 @@ class _SignUpState extends State<SignUp> {
             );
           },
           child: const Text(
-            'Continue To Sing Up',
+            'Continuez votre inscription',
             style: TextStyle(
               color: Color(0xffffffff),
               fontWeight: FontWeight.bold,

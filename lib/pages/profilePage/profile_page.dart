@@ -7,6 +7,7 @@ import 'package:email_validator/email_validator.dart';
 
 import 'widgets/login_screen.dart';
 import 'widgets/SingUp.dart';
+import 'widgets/user_profile.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -18,7 +19,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    // return const Center(child: Text("Profile"));
     return StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -58,34 +58,7 @@ class UserProfile extends StatelessWidget {
           Map<String, dynamic> userData =
               snapshot.data!.data() as Map<String, dynamic>;
 
-          return Container(
-            width: MediaQuery.of(context).size.width,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text("signed in as :"),
-                Text(
-                  "${userData["nom"]} ${userData["prenom"]}, ${userData["age"]} years old",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "email : ${userData["email"]}",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                    onPressed: () async {
-                      await FirebaseAuth.instance.signOut();
-                      Fluttertoast.showToast(msg: "you signed out");
-                    },
-                    child: const Text("Sign out"))
-              ],
-            ),
-          );
+          return UserProfileContent(userData: userData);
         }
 
         return const Center(child: Text("loading"));

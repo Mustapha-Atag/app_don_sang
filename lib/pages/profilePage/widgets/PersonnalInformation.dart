@@ -53,7 +53,7 @@ class _PersonnlInformationState extends State<PersonnlInformation> {
                   children: <Widget>[
                     const SizedBox(height: 20),
                     const Text(
-                      'Sign Up',
+                      "S'inscrire",
                       style: TextStyle(
                         color: Color(0xffFFFFFF),
                         fontSize: 30,
@@ -160,7 +160,7 @@ class _PersonnlInformationState extends State<PersonnlInformation> {
                   Icons.account_box,
                   color: Color(0xffff0000),
                 ),
-                hintText: 'your Age',
+                hintText: 'votre âge',
                 hintStyle: TextStyle(
                   color: Color(0xffff0000),
                 )),
@@ -175,7 +175,7 @@ class _PersonnlInformationState extends State<PersonnlInformation> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Text(
-          'Phone',
+          'Numéro de téléphone',
           style: TextStyle(
             color: Color(0xffffffff),
             fontSize: 15,
@@ -211,7 +211,7 @@ class _PersonnlInformationState extends State<PersonnlInformation> {
                   Icons.phone,
                   color: Color(0xffff0000),
                 ),
-                hintText: 'Phone number',
+                hintText: 'Numéro',
                 hintStyle: TextStyle(
                   color: Color(0xffff0000),
                 )),
@@ -319,7 +319,7 @@ class _PersonnlInformationState extends State<PersonnlInformation> {
           }
         },
         child: const Text(
-          'Create My Account ',
+          'Créer votre compte',
           style: TextStyle(
             color: Color.fromARGB(246, 197, 31, 31),
             fontSize: 18,

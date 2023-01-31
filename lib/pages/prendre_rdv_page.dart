@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../models/collecte_model.dart';
 
 class PrendreRDVPage extends StatefulWidget {
@@ -196,21 +199,108 @@ class _PrendreRDVPageState extends State<PrendreRDVPage> {
                   child: ElevatedButton(
                       onPressed: (_allIsGood)
                           ? () {
-                              final Map<String, dynamic> args = {
-                                "donOption": _selectedOption,
-                                "date": _selectedDate,
-                                "heure": _selectedHour,
-                                "collecteId": widget.collecteData["collecteId"],
-                                "collecteName": widget.collecteData["nom"],
-                                "collecteAddr": widget.collecteData["adresse"]
-                              };
+                              // final Map<String, dynamic> args = {
+                              //   "donOption": _selectedOption,
+                              //   "date": _selectedDate,
+                              //   "heure": _selectedHour,
+                              //   "collecteId": widget.collecteData["collecteId"],
+                              //   "collecteName": widget.collecteData["nom"],
+                              //   "collecteAddr": widget.collecteData["adresse"]
+                              // };
 
-                              Navigator.of(context).pushNamed(
-                                  "/completer_infos_personel",
-                                  arguments: args);
+                              // ********
+                              final CollectionReference RdvCollection =
+                                  FirebaseFirestore.instance.collection("Rdvs");
+                              final CollectionReference collectesCollection =
+                                  FirebaseFirestore.instance
+                                      .collection("collectes");
+                              final CollectionReference usersCollection =
+                                  FirebaseFirestore.instance
+                                      .collection("users");
+
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text("Valider"),
+                                      content: const Text(
+                                          "Vous étes sure vous voulez prendre ce rendez-vous"),
+                                      actions: [
+                                        /*** Confirme button ***/
+                                        TextButton(
+                                            onPressed: () {
+                                              // Add the rdv to FireStore
+                                              final rdvInfos = {
+                                                "collecteId": widget
+                                                    .collecteData["collecteId"],
+                                                "donneurId": FirebaseAuth
+                                                    .instance.currentUser!.uid,
+                                                "collecteNom":
+                                                    widget.collecteData["nom"],
+                                                "collecteAdresse": widget
+                                                    .collecteData["adresse"],
+                                                "dateDon": Timestamp.fromDate(
+                                                    _selectedDate),
+                                                "heure":
+                                                    "${_selectedHour.hour}:${_selectedHour.minute}",
+                                                "typeDon": _selectedOption
+                                              };
+
+                                              RdvCollection.add(rdvInfos).then(
+                                                  (doc) {
+                                                Fluttertoast.showToast(
+                                                    msg: "rdv was added");
+                                                print("rdv was added");
+                                                // adding the id of this RDV to the collecte selected
+                                                collectesCollection
+                                                    .doc(widget.collecteData[
+                                                        "collecteId"])
+                                                    .update({
+                                                      "reservations":
+                                                          FieldValue.arrayUnion(
+                                                              [doc.id])
+                                                    })
+                                                    .then((value) => print(
+                                                        "collecte reservations was updated."))
+                                                    .catchError((error) => print(
+                                                        "failed to updated collecte reservations : $error"));
+                                                // adding the id of this RDV to the user connected
+                                                usersCollection
+                                                    .doc(FirebaseAuth.instance
+                                                        .currentUser!.uid)
+                                                    .update({
+                                                      "reservations":
+                                                          FieldValue.arrayUnion(
+                                                              [doc.id])
+                                                    })
+                                                    .then((value) => print(
+                                                        "users reservations was updated."))
+                                                    .catchError((error) => print(
+                                                        "failed to updated user reservations : $error"));
+                                              }).catchError((error) => print(
+                                                  "failed to add rdv : $error"));
+
+                                              Navigator.of(context)
+                                                  .pushNamedAndRemoveUntil(
+                                                      "/", (route) => false);
+                                            },
+                                            child: const Text("Oui")),
+                                        /*** Cancel Button ***/
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text("Non"))
+                                      ],
+                                    );
+                                  });
+
+                              // Navigator.of(context).pushNamed(
+                              //     "/completer_infos_personel",
+                              //     arguments: args);
                             }
                           : null,
-                      child: const Text("suivant")))
+                      child: const Text("valider")))
             ],
           ),
         ),

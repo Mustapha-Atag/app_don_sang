@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../providers/appProvider.dart';
 
@@ -13,16 +15,68 @@ class RdvPage extends StatefulWidget {
 class _RdvPageState extends State<RdvPage> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppProvider>(
-        builder: (context, appProvider, _) => Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30, top: 20),
-              child: ListView.separated(
-                itemCount: appProvider.mesRdv.length,
-                itemBuilder: (context, index) =>
-                    RdvCard(rdvId: appProvider.mesRdv[index]),
-                separatorBuilder: (context, _) => const SizedBox(height: 20),
-              ),
-            ));
+    return StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Center(
+              child: Text("somthing went wrong"),
+            );
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasData) {
+            final user = FirebaseAuth.instance.currentUser;
+            final usersCollection =
+                FirebaseFirestore.instance.collection("users");
+
+            return FutureBuilder<DocumentSnapshot>(
+              future: usersCollection.doc(user!.uid).get(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError ||
+                    (snapshot.hasData && !snapshot.data!.exists)) {
+                  return const Center(child: Text("Something went wrong"));
+                }
+
+                if (snapshot.connectionState == ConnectionState.done) {
+                  Map<String, dynamic> userData =
+                      snapshot.data!.data() as Map<String, dynamic>;
+                  final reservations = userData["reservations"] as List;
+                  //Fluttertoast.showToast(msg: reservations.length.toString());
+                  return Padding(
+                    padding:
+                        const EdgeInsets.only(left: 30, right: 30, top: 20),
+                    child: ListView.separated(
+                      itemCount: reservations.length,
+                      itemBuilder: (context, index) {
+                        //return Text(reservations[index] as String);
+                        return RdvCard(rdvId: reservations[index]);
+                      },
+                      separatorBuilder: (context, _) =>
+                          const SizedBox(height: 20),
+                    ),
+                  );
+                }
+
+                return const Center(child: Text("loading"));
+              },
+            );
+          } else {
+            return const Center(child: Text("No RDVs"));
+          }
+        });
+
+    // return Consumer<AppProvider>(
+    //     builder: (context, appProvider, _) => Padding(
+    //           padding: const EdgeInsets.only(left: 30, right: 30, top: 20),
+    //           child: ListView.separated(
+    //             itemCount: appProvider.mesRdv.length,
+    //             itemBuilder: (context, index) =>
+    //                 RdvCard(rdvId: appProvider.mesRdv[index]),
+    //             separatorBuilder: (context, _) => const SizedBox(height: 20),
+    //           ),
+    //         ));
   }
 }
 

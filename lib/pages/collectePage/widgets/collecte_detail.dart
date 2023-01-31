@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,6 +10,7 @@ import 'package:provider/provider.dart';
 
 import 'others_widget.dart';
 import '../providers.dart';
+import '../../profilePage/widgets/login_screen.dart';
 
 class CollecteDetailHeader extends StatelessWidget {
   const CollecteDetailHeader({
@@ -107,6 +109,7 @@ class CollecteDetail extends StatelessWidget {
     return Consumer<PanelProvider>(
         builder: (context, panelProvider, _) => Column(
               children: [
+                /*** Collecte details ***/
                 Flexible(
                   child: ListView.builder(
                     controller: scrollController,
@@ -148,6 +151,7 @@ class CollecteDetail extends StatelessWidget {
                     },
                   ),
                 ),
+                /*** Prendre rendez-vous button ***/
                 Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
@@ -159,8 +163,37 @@ class CollecteDetail extends StatelessWidget {
                   width: MediaQuery.of(context).size.width,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, "/prendre_rendez-vous",
-                          arguments: panelProvider.selectedCollecte);
+                      if (FirebaseAuth.instance.currentUser != null) {
+                        Navigator.pushNamed(context, "/prendre_rendez-vous",
+                            arguments: panelProvider.selectedCollecte);
+                      } else {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Alert"),
+                                content: Text("Vous étes pas connecté"),
+                                actions: [
+                                  /*** Cancel button ***/
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Cancel")),
+                                  /*** Sign in Button ***/
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const LoginScreen()));
+                                      },
+                                      child: Text("Sign in"))
+                                ],
+                              );
+                            });
+                      }
                     },
                     child: const Text("Prendre un rendez-vous"),
                   ),

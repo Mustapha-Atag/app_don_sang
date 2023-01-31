@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 10),
                         buildPassword(_passWordController),
                         buildForgotPassBtn(),
-                        buildRememberMe(),
+                        //buildRememberMe(),
                         buildLogingBtn(_formKey),
                         builSignUpBtn(),
                       ],
@@ -142,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Text(
-          'Password',
+          'Mot de passe',
           style: TextStyle(
             color: Color(0xffffffff),
             fontSize: 15,
@@ -187,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         (_obscuretext
                             ? Icons.visibility
                             : Icons.visibility_off))),
-                hintText: 'Password',
+                hintText: 'Mot de passe',
                 hintStyle: const TextStyle(
                   color: Color(0xffff0000),
                 )),
@@ -212,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         },
         child: const Text(
-          'forgotten password?',
+          'Mot de passe oublié?',
           style: TextStyle(
             color: Color(0xffffffff),
             fontWeight: FontWeight.bold,
@@ -328,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           },
           child: const Text(
-            "Don't have an Account? Sing Up",
+            "Vous n’avez pas de compte? Inscrivez-vous",
             style: TextStyle(
               color: Color(0xffffffff),
               fontWeight: FontWeight.bold,
